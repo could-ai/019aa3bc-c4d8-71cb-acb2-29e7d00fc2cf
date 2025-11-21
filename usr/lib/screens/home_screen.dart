@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart'; // Nota: Se necesitaría agregar esta dependencia, pero usaremos stubs por ahora si no está.
+import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -24,6 +24,17 @@ class _HomeScreenState extends State<HomeScreen> {
         duration: const Duration(milliseconds: 800),
         curve: Curves.easeInOut,
       );
+    }
+  }
+
+  Future<void> _launchUrl(String urlString) async {
+    final Uri url = Uri.parse(urlString);
+    try {
+      if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+        debugPrint('Could not launch $url');
+      }
+    } catch (e) {
+      debugPrint('Error launching URL: $e');
     }
   }
 
@@ -326,7 +337,7 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 30),
             ElevatedButton(
               onPressed: () {
-                // Acción de contacto
+                _launchUrl('mailto:contacto@carmomix.com?subject=Contratación%20Carmomix');
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFE50914),
@@ -342,11 +353,23 @@ class _HomeScreenState extends State<HomeScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _SocialIcon(icon: Icons.camera_alt, label: 'Instagram'), // Placeholder icon
+                _SocialIcon(
+                  icon: Icons.camera_alt, 
+                  label: 'Instagram',
+                  onTap: () => _launchUrl('https://instagram.com'),
+                ),
                 const SizedBox(width: 30),
-                _SocialIcon(icon: Icons.play_arrow, label: 'YouTube'),
+                _SocialIcon(
+                  icon: Icons.play_arrow, 
+                  label: 'YouTube',
+                  onTap: () => _launchUrl('https://youtube.com'),
+                ),
                 const SizedBox(width: 30),
-                _SocialIcon(icon: Icons.music_note, label: 'Spotify'),
+                _SocialIcon(
+                  icon: Icons.music_note, 
+                  label: 'Spotify',
+                  onTap: () => _launchUrl('https://spotify.com'),
+                ),
               ],
             ),
           ],
@@ -473,24 +496,33 @@ class _MusicCard extends StatelessWidget {
 class _SocialIcon extends StatelessWidget {
   final IconData icon;
   final String label;
+  final VoidCallback onTap;
 
-  const _SocialIcon({required this.icon, required this.label});
+  const _SocialIcon({
+    required this.icon, 
+    required this.label,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.white24),
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(50),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white24),
+            ),
+            child: Icon(icon, color: Colors.white, size: 24),
           ),
-          child: Icon(icon, color: Colors.white, size: 24),
-        ),
-        const SizedBox(height: 8),
-        Text(label, style: const TextStyle(color: Colors.grey, fontSize: 12)),
-      ],
+          const SizedBox(height: 8),
+          Text(label, style: const TextStyle(color: Colors.grey, fontSize: 12)),
+        ],
+      ),
     );
   }
 }
